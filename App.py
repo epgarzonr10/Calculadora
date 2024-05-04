@@ -1,82 +1,66 @@
 from tkinter import *
-import parser
+import math
 
 root = Tk()
 root.title("Calculator")
 
 display = Entry(root)
-display.grid(row=1, columnspan=6, sticky=W+E)
+display.grid(row=0, column=0, columnspan=4, pady=5)
+display.focus_set()  # Colocar el foco en la entrada al iniciar la calculadora
 
-i = 0
+# Función para agregar números o operadores al campo de entrada
+def add_to_display(value):
+    display.insert(END, value)
 
-# Function to get numbers and display them
-def get_numbers(n):
-    global i
-    display.insert(i, n)
-    i += 1
-
-# Function to get mathematical operations and display them
-def get_operation(operator):
-    global i
-    operator_length = len(operator)
-    display.insert(i, operator)
-    i += operator_length
-
-# Function to calculate the expression entered
-def calculate():
-    display_state = display.get()
-    try:
-        math_expression = parser.expr(display_state).compile()
-        result = eval(math_expression)
-        clear_display()
-        display.insert(0, result)
-    except Exception:
-        clear_display()
-        display.insert(0, 'Error')
-
-# Function to clear the display
-def clear_display():
-    display.delete(0, END)
-
-# Function to undo the last entry
+# Función para eliminar el último carácter del campo de entrada
 def undo():
     display_state = display.get()
     if len(display_state):
         display_new_state = display_state[:-1]
-        clear_display()
+        display.delete(0, END)
         display.insert(0, display_new_state)
-    else:
+
+# Función para limpiar el campo de entrada
+def clear_display():
+    display.delete(0, END)
+
+# Función para calcular el resultado de la expresión en el campo de entrada
+def calculate():
+    try:
+        display_state = display.get()
+        result = eval(display_state)
         clear_display()
-        display.insert(0, 'Error')
+        display.insert(END, result)
+    except Exception as e:
+        clear_display()
+        display.insert(END, 'Error')
 
-# Buttons for numbers
-Button(root, text="1", command=lambda: get_numbers(1)).grid(row=2, column=0)
-Button(root, text="2", command=lambda: get_numbers(2)).grid(row=2, column=1)
-Button(root, text="3", command=lambda: get_numbers(3)).grid(row=2, column=2)
+# Lista de botones para los dígitos y operadores
+buttons = [
+    '7', '8', '9', '/',
+    '4', '5', '6', '*',
+    '1', '2', '3', '-',
+    '0', '.', '=', '+'
+]
 
-Button(root, text="4", command=lambda: get_numbers(4)).grid(row=3, column=0)
-Button(root, text="5", command=lambda: get_numbers(5)).grid(row=3, column=1)
-Button(root, text="6", command=lambda: get_numbers(6)).grid(row=3, column=2)
+# Crear y posicionar los botones en la ventana
+row_num = 1
+col_num = 0
+for button_text in buttons:
+    Button(root, text=button_text, width=5, height=2,
+           command=lambda value=button_text: add_to_display(value)).grid(row=row_num, column=col_num)
+    col_num += 1
+    if col_num > 3:
+        col_num = 0
+        row_num += 1
 
-Button(root, text="7", command=lambda: get_numbers(7)).grid(row=4, column=0)
-Button(root, text="8", command=lambda: get_numbers(8)).grid(row=4, column=1)
-Button(root, text="9", command=lambda: get_numbers(9)).grid(row=4, column=2)
+# Botón para borrar el último carácter del campo de entrada
+Button(root, text="⟵", width=5, height=2, command=undo).grid(row=5, column=0, columnspan=2)
 
-# Additional buttons for operations and functionalities
-Button(root, text="AC", command=lambda: clear_display()).grid(row=5, column=0)
-Button(root, text="0", command=lambda: get_numbers(0)).grid(row=5, column=1)
-Button(root, text="%", command=lambda: get_operation("%")).grid(row=5, column=2)
+# Botón para limpiar el campo de entrada
+Button(root, text="AC", width=5, height=2, command=clear_display).grid(row=5, column=2, columnspan=2)
 
-Button(root, text="+", command=lambda: get_operation("+")).grid(row=2, column=3)
-Button(root, text="-", command=lambda: get_operation("-")).grid(row=3, column=3, sticky=W+E)
-Button(root, text="*", command=lambda: get_operation("*")).grid(row=4, column=3, sticky=W+E)
-Button(root, text="/", command=lambda: get_operation("/")).grid(row=5, column=3, sticky=W+E)
-
-Button(root, text="⟵", command=lambda: undo()).grid(row=2, column=4, sticky=W+E, columnspan=2)
-Button(root, text="exp", command=lambda: get_operation("**")).grid(row=3, column=4)
-Button(root, text="^2", command=lambda: get_operation("**2")).grid(row=3, column=5)
-Button(root, text="(", command=lambda: get_operation("(")).grid(row=4, column=4, sticky=W+E)
-Button(root, text=")", command=lambda:get_operation(")")).grid(row=4, column=5, sticky=W+E)
-Button(root, text="=", command=lambda: calculate()).grid(row=5, column=4, sticky=W+E, columnspan=2)
+# Botón para calcular el resultado de la expresión en el campo de entrada
+Button(root, text="=", width=5, height=2, command=calculate).grid(row=6, column=0, columnspan=4)
 
 root.mainloop()
