@@ -19,4 +19,3 @@ Esta es una calculadora básica creada en Python con una interfaz gráfica utili
 
 1. Clona o descarga el repositorio en tu computadora.
 2. Abre una terminal o línea de comandos y navega hasta el directorio donde se encuentra el archivo `App.py`.
-3. Ejecuta el programa usando el comando:
